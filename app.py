@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+import oracledb
 
 #configuração da aparência
 ctk.set_appearance_mode('dark')
@@ -12,6 +13,8 @@ image_background = Image.open("./media/fundo.png")
 
 background_ctkimage = ctk.CTkImage(light_image=image_background, dark_image=image_background, size=(800,500))
 
+query = input(str("Digite a sua query: "))
+
 
 class DatabaseFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -19,6 +22,72 @@ class DatabaseFrame(ctk.CTkFrame):
         self.pack(fill='both', expand=True)
         label = ctk.CTkLabel(self, text='Bem vindo a página de banco de dados')
         label.pack(pady=20)
+        
+    def rundba(self):
+
+        try:
+
+            wallet = 'wallet'
+            
+            service_name = 'v268zgxpbu2loi9n_high'
+
+            connection = oracledb.connect(
+                user = 'WKSP_PROJETOINTEGRADOR',
+                password =  'Azulamarelo123quatro-',
+                dsn = service_name,
+                config_dir = wallet,
+                wallet_location = wallet,
+                wallet_password = 'Azulamarelo1234cinco-'
+                
+            )
+            
+            cursor = connection.cursor()
+            resultado = cursor.execute(query)
+
+
+            linhas = cursor.fetchall()[0]
+            count_linhas = len(linhas)
+
+            colunas = cursor.description
+            colunas_nome  = []
+            count_colunas = 0
+                        
+            frame_colunas = ctk.CTkFrame(self, border_color='#7C7C7C', border_width=2, fg_color='transparent')
+            frame_colunas.place(relx=0, rely=0, relwidth=1, relheight=0.1)  # topo (10% da tela)
+
+            frame_linha_valor = ctk.CTkFrame(self, border_color='#7C7C7C', border_width=2, fg_color='transparent')
+            frame_linha_valor.place(relx=0, rely=0.1, relwidth=1, relheight=0.9)  # abaixo (90%)
+
+            
+            for coluna in colunas:
+                colunas_nome.append(coluna[0])
+            
+            count_colunas = len(colunas_nome)
+
+
+            
+            # for coluna_nome in colunas:
+            #     label = ctk.CTkLabel(frame_colunas, text=f"{coluna_nome[0]}", fg_color='transparent', width=130, text_color='black')
+            #     label.grid(row=0, column=count_linhas, padx=10, pady=10)
+                
+            
+        
+            for coluna_nome in range(count_colunas):
+                label = ctk.CTkLabel(frame_colunas, text=f"{colunas_nome[coluna_nome]}", fg_color='white', width=130, text_color='black')
+                label.grid(row=0, column=coluna_nome, padx=10, pady=10)
+            
+            
+            for linha_valor in range(count_linhas):
+                label = ctk.CTkLabel(frame_linha_valor, text=f"{linhas[linha_valor]}",fg_color="#7C7C7C", width=130, text_color='black')
+                label.grid(row=0, column=linha_valor, padx=10, pady=10)
+            
+
+            connection.close()
+            
+        except Exception as e:
+            print(e)
+        
+        
 
 
 class MainWindow(ctk.CTk):
@@ -101,6 +170,7 @@ class MainWindow(ctk.CTk):
     def show_database(self):
         self.clear_widget()
         DatabaseFrame(self)
+        DatabaseFrame.rundba(self)        
         
 
 
