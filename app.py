@@ -13,20 +13,25 @@ image_background = Image.open("./media/fundo.png")
 
 background_ctkimage = ctk.CTkImage(light_image=image_background, dark_image=image_background, size=(800,500))
 
-query = input(str("Digite a sua query: "))
-
 
 class DatabaseFrame(ctk.CTkFrame):
+    
     def __init__(self, master):
         super().__init__(master)
         self.pack(fill='both', expand=True)
         label = ctk.CTkLabel(self, text='Bem vindo a página de banco de dados')
         label.pack(pady=20)
         
-    def rundba(self):
-
+    def input_query(self):
+        dialog_input_query = ctk.CTkInputDialog(text="Type in a query: ", title="Input query")
+        return dialog_input_query.get_input()
+         
+    def rundba(self):        
+        
+        
         try:
-
+            resultado_query = self.input_query()
+            
             wallet = 'wallet'
             
             service_name = 'v268zgxpbu2loi9n_high'
@@ -42,7 +47,7 @@ class DatabaseFrame(ctk.CTkFrame):
             )
             
             cursor = connection.cursor()
-            resultado = cursor.execute(query)
+            resultado = cursor.execute(resultado_query)
 
 
             linhas = cursor.fetchall()[0]
@@ -70,17 +75,36 @@ class DatabaseFrame(ctk.CTkFrame):
             #     label = ctk.CTkLabel(frame_colunas, text=f"{coluna_nome[0]}", fg_color='transparent', width=130, text_color='black')
             #     label.grid(row=0, column=count_linhas, padx=10, pady=10)
                 
-            
+            html_column = []   
+            html_row = [] 
         
             for coluna_nome in range(count_colunas):
                 label = ctk.CTkLabel(frame_colunas, text=f"{colunas_nome[coluna_nome]}", fg_color='white', width=130, text_color='black')
                 label.grid(row=0, column=coluna_nome, padx=10, pady=10)
+                html_column.append(f"<th>{colunas_nome[coluna_nome]}</th>")
+            
+            html_column.insert(0,'<tr>')
+            html_column.append('</tr>')
+            
+            resultado_html_colunas = ''.join(html_column) 
+            print(resultado_html_colunas)
+            
+
+                
+                
             
             
             for linha_valor in range(count_linhas):
                 label = ctk.CTkLabel(frame_linha_valor, text=f"{linhas[linha_valor]}",fg_color="#7C7C7C", width=130, text_color='black')
                 label.grid(row=0, column=linha_valor, padx=10, pady=10)
+                html_row.append(f"<tr>{linhas[linha_valor]}</tr>")
             
+            #Exibe html console --> html_folder_template
+            for html in html_column:
+                print(html)
+            
+            for html in html_row:
+                print(html)
 
             connection.close()
             
@@ -169,8 +193,9 @@ class MainWindow(ctk.CTk):
         
     def show_database(self):
         self.clear_widget()
-        DatabaseFrame(self)
-        DatabaseFrame.rundba(self)        
+        db_frame = DatabaseFrame(self)
+        db_frame.rundba()
+        
         
 
 
